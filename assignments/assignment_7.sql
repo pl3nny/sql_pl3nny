@@ -28,6 +28,9 @@ FROM students s, courses c, professors p
 -- 3. If you execute the query from the prevoius answer, you'll notice the student_name and
 -- the course_no is being repeated. Why is this happening?
 
+-- the tables are multiplying with other expanding the number of records
+-- 6*5*10 = 300 records
+
 -- 4. In question 3 you discovered why there is repeating data. How can we eliminiate this
 -- redundancy? Let's say we only care to see a single professor teaching a course and we
 -- don't care for all the other professors that teach the particular course. Write a query
@@ -35,12 +38,37 @@ FROM students s, courses c, professors p
 
 -- HINT: Using the DISTINCT keywork will not help
 
+SELECT 
+student_name,
+(SELECT course_title FROM courses WHERE enrolled.course_no = courses.course_no), 
+enrolled.last_name
+FROM
+(
+	SELECT student_no, se.course_no, last_name
+	FROM student_enrollment se INNER JOIN teach t
+	ON se.course_no = t.course_no
+) enrolled INNER JOIN students 
+ON students.student_no = enrolled.student_no
+WHERE enrolled.last_name = 'Chong'
+
 -- 5. Why aare correlated subqueries slower than non-correlated subqueries and joins?
+
+-- correlated subqueries run for every record
 
 -- 6. In the video lectures, we've been discussing the employees table and the department table.
 -- Considering those tables, write a query that returns employees whose salary is above
 -- average for their given department.
 
--- 7. Write a query that returns ALL the s tudents as well as any courses they may or many 
+SELECT employee_id, first_name, department, salary
+FROM employees e1
+WHERE salary > 
+(
+	SELECT round(AVG(salary)) FROM employees e2 
+	WHERE e1.department = e2.department
+)
+
+-- 7. Write a query that returns ALL the students as well as any courses they may or may 
 -- not be taking
+
+
 
